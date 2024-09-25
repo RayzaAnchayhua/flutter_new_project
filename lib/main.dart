@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(
-              seedColor: const Color.fromARGB(255, 255, 0, 255)),
+              seedColor: Colors.purple),
         ),
         home: MyHomePage(),
       ),
@@ -42,13 +42,13 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     var appState =
         context.watch<MyAppState>(); //appState = i want to rebuid every time
+    var pair = appState.current;
 
     return Scaffold(
       body: Column(
         children: [
           Text('A random idea for:'),
-          Text(appState.current
-              .asPascalCase), //use too LowerCase,UpperCase or SnakeCase!
+          BigCard(pair: pair), //use too LowerCase,UpperCase or SnakeCase!
           ElevatedButton(
             onPressed: () {
               appState.getNext();
@@ -56,6 +56,28 @@ class MyHomePage extends StatelessWidget {
             child: Text('Random'),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class BigCard extends StatelessWidget {
+  const BigCard({
+    super.key,
+    required this.pair,
+  });
+
+  final WordPair pair;
+
+  @override
+  Widget build(BuildContext context) {
+    var theme = Theme.of(context);
+
+    return Card(
+      color: theme.colorScheme.primary,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(pair.asPascalCase),
       ),
     );
   }
