@@ -18,8 +18,7 @@ class MyApp extends StatelessWidget {
         title: 'Random Name',
         theme: ThemeData(
           useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(
-              seedColor: Colors.purple),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.purple),
         ),
         home: MyHomePage(),
       ),
@@ -35,6 +34,17 @@ class MyAppState extends ChangeNotifier {
     current = WordPair.random();
     notifyListeners();
   }
+
+  var favorites = <WordPair>[];
+
+  void toggleFavorite() {
+    if (favorites.contains(current)) {
+      favorites.remove(current);
+    } else {
+      favorites.add(current);
+    }
+    notifyListeners();
+  }
 }
 
 class MyHomePage extends StatelessWidget {
@@ -44,18 +54,44 @@ class MyHomePage extends StatelessWidget {
         context.watch<MyAppState>(); //appState = i want to rebuid every time
     var pair = appState.current;
 
+    IconData icon;
+    if (appState.favorites.contains(pair)) {
+      icon = Icons.favorite;
+    } else {
+      icon = Icons.favorite_border;
+    }
+
     return Scaffold(
-      body: Column(
-        children: [
-          Text('A random idea for:'),
-          BigCard(pair: pair), //use too LowerCase,UpperCase or SnakeCase!
-          ElevatedButton(
-            onPressed: () {
-              appState.getNext();
-            },
-            child: Text('Random'),
-          ),
-        ],
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            BigCard(pair: pair), //use too LowerCase,UpperCase or SnakeCase!
+            SizedBox(
+                height:
+                    15), //meio que um div no botao next e o botao de palavras
+            Row(
+              mainAxisSize:
+                  MainAxisSize.min, //hey dude, don't take every spaceS
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () {
+                    appState.toggleFavorite();
+                  },
+                  icon: Icon(icon),
+                  label: Text('Like'),
+                ),
+                SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    appState.getNext();
+                  },
+                  child: Text('Random'),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -71,13 +107,20 @@ class BigCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var theme = Theme.of(context);
+    final theme = Theme.of(context);
+    final style = theme.textTheme.displayMedium!.copyWith(
+      color: theme.colorScheme.onPrimary,
+    );
 
     return Card(
       color: theme.colorScheme.primary,
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Text(pair.asPascalCase),
+        padding: const EdgeInsets.all(25),
+        child: Text(
+          pair.asPascalCase,
+          style: style,
+          semanticsLabel: "${pair.first} ${pair.second}",
+        ),
       ),
     );
   }
